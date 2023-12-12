@@ -285,7 +285,7 @@ def stitch_clips():
     os.remove("file_list.txt")
 
 
-def slice_video(source, start, end, buffer=50, filename=None):
+def slice_video(source, start, end, buffer=50, filename=video_filename()):
     if not filename:
         raise Exception("Filename is required")
 
@@ -353,7 +353,7 @@ def find_words(data, needles):
     return found
 
 
-def get_words_for_phrase(data, phrase):
+def get_words_to_make_phrase(data, phrase):
     word_list = []
     phrase = phrase.lower()
     for w in phrase.split(" "):
@@ -404,20 +404,6 @@ def reset_phrases(data):
     return data
 
 
-def clip_and_stitch_from_prompt(data, prompt=None):
-    # data = reset_phrases(data)
-    if not data.get("phrases"):
-        data["phrases"] = []
-        data = get_phrases(data, prompt=prompt)
-        write_data(data)
-
-    data = get_timestamps_for_phrases(data)
-    write_data(data)
-
-    slice_by_phrases(data["phrases"], buffer=150)
-    stitch_clips()
-
-
 def clip_and_stitch_from_needles(data, needles=""):
     word_list = []
     for needle in needles.split(" "):
@@ -430,14 +416,28 @@ def clip_and_stitch_from_needles(data, needles=""):
     stitch_clips()
 
 
-def clip_and_stitch_from_phrase(data, phrase):
-    words = get_words_for_phrase(data, phrase)
+def clip_and_stitch_to_make_phrase(data, phrase):
+    words = get_words_to_make_phrase(data, phrase)
     slice_by_words(words, buffer=50)
 
 
 def clip_and_stitch_from_highlights(data):
     timestamps = get_timestamps_for_highlights(data)
     slice_by_timestamps(timestamps, buffer=50)
+    stitch_clips()
+
+
+def clip_and_stitch_from_prompt(data, prompt=None):
+    # data = reset_phrases(data)
+    if not data.get("phrases"):
+        data["phrases"] = []
+        data = get_phrases(data, prompt=prompt)
+        write_data(data)
+
+    data = get_timestamps_for_phrases(data)
+    write_data(data)
+
+    slice_by_phrases(data["phrases"], buffer=150)
     stitch_clips()
 
 
