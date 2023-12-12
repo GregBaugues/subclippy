@@ -4,3 +4,6 @@ rendered/*
 audio/*
 data/*
 venv
+__pycache__
+.cursorignore
+.DS_Store
