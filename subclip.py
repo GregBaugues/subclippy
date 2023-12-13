@@ -267,7 +267,6 @@ def stitch_clips():
     import subprocess
 
     clips_dir = "clips/"
-    output_file = rendered_filename()
     clips = [
         clips_dir + clip
         for clip in os.listdir(clips_dir)
@@ -280,7 +279,16 @@ def stitch_clips():
             f.write(f"file '{clip}'\n")
 
     subprocess.run(
-        ["ffmpeg", "-f", "concat", "-i", "file_list.txt", "-c", "copy", output_file]
+        [
+            "ffmpeg",
+            "-f",
+            "concat",
+            "-i",
+            "file_list.txt",
+            "-c",
+            "copy",
+            rendered_filename(),
+        ]
     )
     os.remove("file_list.txt")
 
