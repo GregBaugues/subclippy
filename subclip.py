@@ -246,14 +246,14 @@ def calc_word_frequency(data):
     words = data["words"]
     word_frequency = {}
     for word in words:
-        w = word["text"].replace(".", "").replace("!", "")
+        w = clean_string(word["text"])
         if w in word_frequency:
             word_frequency[w] += 1
         else:
             word_frequency[w] = 1
 
     for w in data["words"]:
-        w["frequency"] = word_frequency[w["text"].replace(".", "").replace("!", "")]
+        w["frequency"] = word_frequency[clean_string(w["text"])]
 
     # print word frequency sorted by frequency
 
