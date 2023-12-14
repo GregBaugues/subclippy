@@ -7,8 +7,8 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from pytube import YouTube
 import subprocess
 
-YOUTUBE_URL = "https://www.youtube.com/watch?v=yj-wSRJwrrc"
-BASE_FILENAME = "pydantic"
+YOUTUBE_URL = "https://www.youtube.com/watch?v=_GxrDjGRfFc"
+BASE_FILENAME = "new_heights"
 
 
 def video_filename():
@@ -104,6 +104,12 @@ def transcribe():
     return transcript
 
 
+def clean_string(s):
+    s = s.lower()
+    s = "".join(c for c in s if c.isalnum() or c.isspace() or c == "'")
+    return s
+
+
 def get_transcript_data(transcript):
     data = {}
     data["youtube_url"] = YOUTUBE_URL
@@ -128,14 +134,10 @@ def get_transcript_data(transcript):
     for word in transcript.words:
         data["words"].append(
             {
+                "text": clean_string(word.text),
                 "start": word.start,
                 "end": word.end,
                 "confidence": word.confidence,
-                "text": word.text.lower()
-                .replace(".", "")
-                .replace("!", "")
-                .replace("?", "")
-                .replace(",", ""),
             }
         )
 
@@ -212,7 +214,7 @@ def calc_durations(data):
 
 def find_exact_stamp(data, phrase):
     # Clean up the phrase text.
-    phrase_text = phrase["text"].lower().translate(str.maketrans("", "", ",.!?"))
+    phrase_text = clean_string(phrase["text"])
     phrase_words = phrase_text.split()
 
     # Early exit if phrase is empty.
@@ -451,7 +453,7 @@ def clip_and_stitch_from_prompt(data, prompt=None):
 
 if __name__ == "__main__":
     if not os.path.exists(video_filename()):
-        download_video(res="720p")
+        download_video(res="1080p")
 
     if os.path.exists(data_filename()):
         data = load_data()
@@ -462,12 +464,13 @@ if __name__ == "__main__":
 
     prompt = """
             This is a transcript from a youtube video.
-            Extract the most important quotes from this clip. 
+            Extract the most interesting and funny quotes from this clip. 
             Give me exact quotes -- do not paraphrase.
-            Each clip should be 50-150 words.  
+            Select the clips most likely to go viral.
+            Each clip should be 50-200 words.
             """
 
+    clip_and_stitch_from_prompt(data, prompt=prompt)
     # clip_and_stitch_from_needles(data, needles=["lazers"])
-    # clip_and_stitch_from_prompt(data, prompt=prompt)
     # clip_and_stitch_from_phrase(data, phrase="")
-    clip_and_stitch_from_highlights(data)
+    # clip_and_stitch_from_highlights(data)
